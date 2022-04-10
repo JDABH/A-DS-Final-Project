@@ -1,194 +1,190 @@
+import com.sun.jdi.Value;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
 public class TST<Value> {
-    private int n;              // size
-    private Node<Value> root;   // root of TST
 
-    private static class Node<Value> {
-        private char c;                        // character
-        private Node<Value> left, mid, right;  // left, middle, and right subtries
-        private Value val;                     // value associated with string
+    int n;  // size of the ternary search tree
+    TSTNode root; // root node of the TST
+
+    private static class TSTNode<Value> {
+        private char character;
+        private TSTNode<Value> left, middle, right;
+        private Value value;
     }
 
-    /**
-     * Initializes an empty string symbol table.
-     */
-    public TST() {
+
+    TST() {
+
+        try {
+            FileReader reader = new FileReader("stops.txt");
+
+            Scanner scanner = new Scanner(reader).useDelimiter(",");
+
+            // Skipping over the first line as that is just the headers for the data
+            scanner.nextLine();
+
+            // starting at key 2, as this can be used later on to print specific lines from the stops.txt file
+            Integer value = 2;
+            while(scanner.hasNextLine()) {
+                // skip the first two values in every line as we are only looking for the stop name
+                scanner.next();
+                scanner.next();
+                String stop = scanner.next();
+                String[] nameSplit = stop.split(" ", 2);
+                if ( nameSplit[0].equalsIgnoreCase("FLAGSTOP") || nameSplit[0].equalsIgnoreCase("WB")
+                        || nameSplit[0].equalsIgnoreCase("NB") || nameSplit[0].equalsIgnoreCase("SB")
+                            || nameSplit[0].equalsIgnoreCase("EB")) {
+                    stop = nameSplit[1] + " " + nameSplit[0];
+                }
+                this.put(stop, (Value)value);
+                scanner.nextLine();
+                value++;
+            }
+
+
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Returns the number of key-value pairs in this symbol table.
-     * @return the number of key-value pairs in this symbol table
-     */
-    public int size() {
+    // get the size, fairly straightforward so far
+    public int getSize() {
         return n;
     }
 
-    /**
-     * Does this symbol table contain the given key?
-     * @param key the key
-     * @return {@code true} if this symbol table contains {@code key} and
-     *     {@code false} otherwise
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
-    public boolean contains(String key) {
+    public boolean containsKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("argument to contains() is null");
         }
         return get(key) != null;
     }
 
-    /**
-     * Returns the value associated with the given key.
-     * @param key the key
-     * @return the value associated with the given key if the key is in the symbol table
-     *     and {@code null} if the key is not in the symbol table
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
     public Value get(String key) {
         if (key == null) {
-            throw new IllegalArgumentException("calls get() with null argument");
+            throw new IllegalArgumentException("called get() with an invalid argument");
         }
-        if (key.length() == 0) throw new IllegalArgumentException("key must have length >= 1");
-        Node<Value> x = get(root, key, 0);
-        if (x == null) return null;
-        return x.val;
+        if ( key.length() == 0) {
+            throw new IllegalArgumentException("key must have a length greater than one");
+        }
+        TSTNode<Value>x = get(root, key, 0);
+        if (x == null) {
+            return null;
+        }
+        return x.value;
     }
 
-    // return subtrie corresponding to given key
-    private Node<Value> get(Node<Value> x, String key, int d) {
-        if (x == null) return null;
-        if (key.length() == 0) throw new IllegalArgumentException("key must have length >= 1");
+    // return the subtrie of the given key, if any
+    private TSTNode<Value> get(TSTNode<Value> node, String key, int d){
+        if ( node == null) {
+            return null;
+        }
         char c = key.charAt(d);
-        if      (c < x.c)              return get(x.left,  key, d);
-        else if (c > x.c)              return get(x.right, key, d);
-        else if (d < key.length() - 1) return get(x.mid,   key, d+1);
-        else                           return x;
+        if (c < node.character) {
+            return get(node.left, key, d);
+        }
+        else if (c > node.character) {
+            return get(node.right, key, d);
+        }
+        else if (d < key.length() - 1) {
+            return get(node.middle,   key, d+1);
+        }
+        else {
+            return node;
+        }
     }
 
-    /**
-     * Inserts the key-value pair into the symbol table, overwriting the old value
-     * with the new value if the key is already in the symbol table.
-     * If the value is {@code null}, this effectively deletes the key from the symbol table.
-     * @param key the key
-     * @param val the value
-     * @throws IllegalArgumentException if {@code key} is {@code null}
-     */
     public void put(String key, Value val) {
         if (key == null) {
-            throw new IllegalArgumentException("calls put() with null key");
+            throw new IllegalArgumentException("can't call put() with a null key");
         }
-        if (!contains(key)) n++;
-        else if(val == null) n--;       // delete existing key
+        if (!containsKey(key)) n++;
+        else if (val == null) {
+            n--;
+        }
         root = put(root, key, val, 0);
     }
 
-    private Node<Value> put(Node<Value> x, String key, Value val, int d) {
+    private TSTNode<Value> put(TSTNode<Value> node, String key, Value value, int d) {
         char c = key.charAt(d);
-        if (x == null) {
-            x = new Node<Value>();
-            x.c = c;
+        if (node == null) {
+            node = new TSTNode<Value>();
+            node.character = c;
         }
-        if      (c < x.c)               x.left  = put(x.left,  key, val, d);
-        else if (c > x.c)               x.right = put(x.right, key, val, d);
-        else if (d < key.length() - 1)  x.mid   = put(x.mid,   key, val, d+1);
-        else                            x.val   = val;
-        return x;
+        if ( c < node.character) {
+            node.left = put(node.left, key, value, d);
+        }
+        else if ( c > node.character) {
+            node.right = put(node.right, key, value, d);
+        }
+        else if (d < key.length() - 1) {
+            node.middle = put(node.middle, key, value, d + 1);
+        }
+        else {
+            node.value = value;
+        }
+        return node;
+
     }
 
-    /**
-     * Returns the string in the symbol table that is the longest prefix of {@code query},
-     * or {@code null}, if no such string.
-     * @param query the query string
-     * @return the string in the symbol table that is the longest prefix of {@code query},
-     *     or {@code null} if no such string
-     * @throws IllegalArgumentException if {@code query} is {@code null}
-     */
-    public String longestPrefixOf(String query) {
-        if (query == null) {
-            throw new IllegalArgumentException("calls longestPrefixOf() with null argument");
-        }
-        if (query.length() == 0) return null;
-        int length = 0;
-        Node<Value> x = root;
-        int i = 0;
-        while (x != null && i < query.length()) {
-            char c = query.charAt(i);
-            if      (c < x.c) x = x.left;
-            else if (c > x.c) x = x.right;
-            else {
-                i++;
-                if (x.val != null) length = i;
-                x = x.mid;
-            }
-        }
-        return query.substring(0, length);
-    }
 
-    /**
-     * Returns all keys in the symbol table as an {@code Iterable}.
-     * To iterate over all of the keys in the symbol table named {@code st},
-     * use the foreach notation: {@code for (Key key : st.keys())}.
-     * @return all keys in the symbol table as an {@code Iterable}
-     */
-    public Iterable<String> keys() {
-        Queue<String> queue = new Queue<String>();
-        collect(root, new StringBuilder(), queue);
-        return queue;
-    }
-
-    /**
-     * Returns all of the keys in the set that start with {@code prefix}.
-     * @param prefix the prefix
-     * @return all of the keys in the set that start with {@code prefix},
-     *     as an iterable
-     * @throws IllegalArgumentException if {@code prefix} is {@code null}
-     */
-    public Iterable<String> keysWithPrefix(String prefix) {
+    public Iterable<String> keyWithGivenPrefix(String prefix) {
         if (prefix == null) {
-            throw new IllegalArgumentException("calls keysWithPrefix() with null argument");
+            throw new IllegalArgumentException("can't give a null argument to keysWithGivenPrefix()");
         }
-        Queue<String> queue = new Queue<String>();
-        Node<Value> x = get(root, prefix, 0);
-        if (x == null) return queue;
-        if (x.val != null) queue.enqueue(prefix);
-        collect(x.mid, new StringBuilder(prefix), queue);
+        Queue<String> queue = new LinkedList<>();
+        TSTNode node = get(root, prefix, 0);
+        if ( node == null ) {
+            return queue;
+        }
+        if ( node.value != null) {
+            queue.add(prefix);
+        }
+        collect(node.middle, new StringBuilder(prefix), queue);
         return queue;
     }
 
-    // all keys in subtrie rooted at x with given prefix
-    private void collect(Node<Value> x, StringBuilder prefix, Queue<String> queue) {
-        if (x == null) return;
-        collect(x.left,  prefix, queue);
-        if (x.val != null) queue.enqueue(prefix.toString() + x.c);
-        collect(x.mid,   prefix.append(x.c), queue);
+    private void collect(TSTNode node, StringBuilder prefix, Queue<String> queue) {
+        if ( node == null ) {
+            return;
+        }
+        collect(node.left, prefix, queue);
+        if (node.value != null) {
+            queue.add(prefix.toString() + node.character);
+        }
+        collect(node.middle, prefix.append(node.character), queue);
         prefix.deleteCharAt(prefix.length() - 1);
-        collect(x.right, prefix, queue);
+        collect(node.right, prefix, queue);
     }
 
 
-    /**
-     * Returns all of the keys in the symbol table that match {@code pattern},
-     * where the character '.' is interpreted as a wildcard character.
-     * @param pattern the pattern
-     * @return all of the keys in the symbol table that match {@code pattern},
-     *     as an iterable, where . is treated as a wildcard character.
-     */
-    public Iterable<String> keysThatMatch(String pattern) {
-        Queue<String> queue = new Queue<String>();
-        collect(root, new StringBuilder(), 0, pattern, queue);
-        return queue;
-    }
+    public static void main(String[] args) {
+        TST<Integer> newTST = new TST<>();
 
-    private void collect(Node<Value> x, StringBuilder prefix, int i, String pattern, Queue<String> queue) {
-        if (x == null) return;
-        char c = pattern.charAt(i);
-        if (c == '.' || c < x.c) collect(x.left, prefix, i, pattern, queue);
-        if (c == '.' || c == x.c) {
-            if (i == pattern.length() - 1 && x.val != null) queue.enqueue(prefix.toString() + x.c);
-            if (i < pattern.length() - 1) {
-                collect(x.mid, prefix.append(x.c), i+1, pattern, queue);
-                prefix.deleteCharAt(prefix.length() - 1);
-            }
+        Scanner scanboy = new Scanner(System.in);
+
+        System.out.println("What's the stop name?");
+
+        String input = scanboy.next();
+
+        System.out.println(newTST.get(input));
+
+        scanboy.nextLine();
+        System.out.println("Get that iterable baby");
+        input = scanboy.next();
+
+        //System.out.println(newTST.keyWithGivenPrefix(input));
+        Iterable<String> collection = newTST.keyWithGivenPrefix(input);
+        for(String s : collection) {
+            System.out.println(s);
         }
-        if (c == '.' || c > x.c) collect(x.right, prefix, i, pattern, queue);
     }
 
+
+}

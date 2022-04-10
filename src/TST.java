@@ -33,8 +33,8 @@ public class TST<Value> {
             Integer value = 2;
             while(scanner.hasNextLine()) {
                 // skip the first two values in every line as we are only looking for the stop name
-                scanner.next();
-                scanner.next();
+                String stopID = ("Stop ID: " + scanner.next() + ", ");
+                String stopCode = ("Stop Code: " + scanner.next());
                 String stop = scanner.next();
                 String[] nameSplit = stop.split(" ", 2);
                 if ( nameSplit[0].equalsIgnoreCase("FLAGSTOP") || nameSplit[0].equalsIgnoreCase("WB")
@@ -42,6 +42,7 @@ public class TST<Value> {
                             || nameSplit[0].equalsIgnoreCase("EB")) {
                     stop = nameSplit[1] + " " + nameSplit[0];
                 }
+                stop = stop + ", " + stopID + stopCode;
                 this.put(stop, (Value)value);
                 scanner.nextLine();
                 value++;
@@ -169,15 +170,9 @@ public class TST<Value> {
 
         Scanner scanboy = new Scanner(System.in);
 
-        System.out.println("What's the stop name?");
-
-        String input = scanboy.next();
-
-        System.out.println(newTST.get(input));
-
         scanboy.nextLine();
         System.out.println("Get that iterable baby");
-        input = scanboy.next();
+        String input = scanboy.nextLine();
 
         //System.out.println(newTST.keyWithGivenPrefix(input));
         Iterable<String> collection = newTST.keyWithGivenPrefix(input);

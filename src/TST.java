@@ -1,8 +1,5 @@
-import com.sun.jdi.Value;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -170,7 +167,6 @@ public class TST<Value> {
 
         Scanner scanboy = new Scanner(System.in);
 
-        scanboy.nextLine();
         System.out.println("Get that iterable baby");
         String input = scanboy.nextLine();
 

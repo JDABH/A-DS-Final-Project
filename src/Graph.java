@@ -116,6 +116,10 @@ public class Graph {
     }
 
     public static Graph calculateDijkstra(Graph graph, StopNode source) {
+        if ( source == null) {
+            System.out.println("This stop doesn't exist");
+            return graph;
+        }
         source.setCost(0);
 
         Set<StopNode> settledNodes = new HashSet<>();
@@ -168,19 +172,25 @@ public class Graph {
             return destNode.cost;
         }
         else {
-            throw new IllegalArgumentException("That stop isn't in the graph");
+            System.out.println("That stop isn't in the graph");
+            return Double.POSITIVE_INFINITY;
         }
     }
 
     public void printPath(StopNode destination) {
-        for ( int i = 0 ; i < destination.shortest.size() - 1; i++) {
-            System.out.print(destination.shortest.get(i).stopId + " to " + destination.shortest.get(i + 1).stopId);
-            System.out.printf(", Cost: %.4f\n", (destination.shortest.get(i+1).cost - destination.shortest.get(i).cost));
-        }
-        System.out.print(destination.shortest.get(destination.shortest.size()-1).stopId + " to " + destination.stopId);
-        System.out.printf(", Cost: %.4f\n", (destination.cost - destination.shortest.get(destination.shortest.size()-1).cost));
+        if (destination.shortest.size() > 0) {
+            for (int i = 0; i < destination.shortest.size() - 1; i++) {
+                System.out.print(destination.shortest.get(i).stopId + " to " + destination.shortest.get(i + 1).stopId);
+                System.out.printf(", Cost: %.4f\n", (destination.shortest.get(i + 1).cost - destination.shortest.get(i).cost));
+            }
+            System.out.print(destination.shortest.get(destination.shortest.size() - 1).stopId + " to " + destination.stopId);
+            System.out.printf(", Cost: %.4f\n", (destination.cost - destination.shortest.get(destination.shortest.size() - 1).cost));
 
-        System.out.printf("Total Cost: %.4f\n", this.getCost(destination));
+            System.out.printf("Total Cost: %.4f\n", this.getCost(destination));
+        }
+        else {
+            System.out.println("There is no path between these stops");
+        }
     }
 
     public static void main(String[] args) {

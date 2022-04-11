@@ -53,7 +53,7 @@ public class SearchByTime<Value> {
         }
     }
 
-    private boolean isValidTime(String timeToCheck) {
+    public boolean isValidTime(String timeToCheck) {
         String[] intChecks = timeToCheck.split(":");
         // can't be more than three units of time in this format, hours:minutes:seconds
         if (intChecks.length > 3) {

@@ -26,8 +26,8 @@ public class TST<Value> {
             // Skipping over the first line as that is just the headers for the data
             scanner.nextLine();
 
-            // starting at key 2, as this can be used later on to print specific lines from the stops.txt file
-            Integer value = 2;
+            // starting at key 0
+            Integer value = 0;
             while(scanner.hasNextLine()) {
                 // skip the first two values in every line as we are only looking for the stop name
                 String stopID = ("Stop ID: " + scanner.next() + ", ");

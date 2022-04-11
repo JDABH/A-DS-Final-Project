@@ -69,11 +69,8 @@ public class SearchByTime<Value> {
             }
 
         }
-        if ( stringToInt[0] > 23 || stringToInt[1] > 59 || stringToInt[2] > 59) {
-            return false;
-        }
-
-        return true;
+        return stringToInt[0] <= 23 && stringToInt[0] >= 0 && stringToInt[1] <= 59 && stringToInt[1] >= 0
+                && stringToInt[2] <= 59 && stringToInt[2] >= 0;
     }
 
     // get the size, fairly straightforward so far

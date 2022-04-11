@@ -56,12 +56,18 @@ public class SearchByTime<Value> {
     public boolean isValidTime(String timeToCheck) {
         String[] intChecks = timeToCheck.split(":");
         // can't be more than three units of time in this format, hours:minutes:seconds
-        if (intChecks.length > 3) {
+        if (intChecks.length != 3) {
             return false;
         }
         int[] stringToInt = new int[intChecks.length];
         for (int i = 0; i < stringToInt.length; i++) {
-            stringToInt[i] = Integer.parseInt(intChecks[i]);
+            try {
+                stringToInt[i] = Integer.parseInt(intChecks[i]);
+            }
+            catch (NumberFormatException nfe) {
+                return false;
+            }
+
         }
         if ( stringToInt[0] > 23 || stringToInt[1] > 59 || stringToInt[2] > 59) {
             return false;

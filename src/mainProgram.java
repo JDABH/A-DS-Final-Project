@@ -59,7 +59,6 @@ public class mainProgram {
                 boolean checkingNodes = true;
 
                 while(checkingNodes) {
-
                     System.out.println("Which stop is the start of your journey?");
                     if (scanner.hasNextInt()) {
 
@@ -93,6 +92,7 @@ public class mainProgram {
                                 }
                             } else {
                                 System.out.println("Error - please give a postive integer value");
+                                scanner.nextLine();
                             }
                         }
 
@@ -114,6 +114,7 @@ public class mainProgram {
                         }
                     } else {
                         System.out.println("Error - please give a positive integer value");
+                        scanner.nextLine();
                     }
                 }
             }
